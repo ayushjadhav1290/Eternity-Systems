@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cloud Service Selector</title>
+  <link rel="stylesheet" href="public/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="public/depth-map-generator.js"></script>
+  <script src="public/focus-mask-generator.js"></script>
+  <script src="public/film-grain-generator.js"></script>
+  <script src="public/glow-mask-generator.js"></script>
+  <script src="public/focus-reveal.js"></script>
+</head>
+<body>
+  <canvas id="focusRevealCanvas" class="focus-reveal-canvas"></canvas>
+  <div class="container">
+    <header>
+      <h1>☁️ Cloud Service Selector</h1>
+      <p class="subtitle">Find the best cloud provider for your needs</p>
+    </header>
+
+    <main>
+      <!-- Slide Container -->
+      <div class="slides-container">
+        <!-- Slide 1: Form -->
+        <section class="slide active" id="slide-form">
+          <div class="form-section">
+            <h2>Select Your Criteria</h2>
+            <p class="description">Pick which criteria you care about, then adjust their weights (0-100)</p>
+
+            <div class="criteria-selection">
+              <label class="criteria-selection-label">Choose criteria to adjust:</label>
+              <div class="criteria-checkboxes" id="criteriaCheckboxes">
+                <!-- Checkboxes populated by script.js -->
+              </div>
+            </div>
+            
+            <form id="criteriaForm">
+              <div id="slidersContainer" class="criteria-group">
+                <!-- Sliders rendered here based on selected criteria -->
+              </div>
+
+              <button type="submit" class="btn-analyze">Find Best Provider</button>
+            </form>
+          </div>
+        </section>
+
+        <!-- Slide 2: Results -->
+        <section class="slide" id="slide-results">
+          <div id="resultsSection" class="results-section">
+            <h2>Analysis Results</h2>
+            
+            <div class="result-card">
+              <div class="winner-badge">🏆 Best Choice</div>
+              <h3 id="bestProviderName"></h3>
+              <p id="bestProviderDescription" class="provider-description"></p>
+              <div class="score-display">
+                <span class="score-label">Overall Score:</span>
+                <span class="score-value" id="bestScore"></span>
+              </div>
+              
+              <div class="reasoning-box">
+                <h4>Why this provider?</h4>
+                <p id="reasoning"></p>
+              </div>
+
+              <div class="details-grid">
+                <div class="detail-item">
+                  <span class="detail-label">Price Score</span>
+                  <span class="detail-value" id="detailPrice"></span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Efficiency</span>
+                  <span class="detail-value" id="detailEfficiency"></span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Speed</span>
+                  <span class="detail-value" id="detailSpeed"></span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Reliability</span>
+                  <span class="detail-value" id="detailReliability"></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="comparison-section">
+              <h3>Comparison with Other Providers</h3>
+              <div class="provider-ranking" id="providerRanking"></div>
+            </div>
+            
+          </div>
+        </section>
+
+        <!-- Slide 3: Error -->
+        <section class="slide" id="slide-error">
+          <section id="errorSection" class="error-section">
+            <div class="error-card">
+              <h3>⚠️ Error</h3>
+              <p id="errorMessage"></p>
+            </div>
+          </section>
+        </section>
+
+        <!-- Slide 4: Loading -->
+        <section class="slide" id="slide-loading">
+          <section id="loadingSection" class="loading-section">
+            <div class="spinner"></div>
+            <p>Analyzing cloud providers...</p>
+          </section>
+        </section>
+      </div>
+
+      <!-- Navigation Controls -->
+      <div class="slide-controls">
+        <button id="prevSlideBtn" class="btn-slide-nav btn-prev" disabled>← Previous</button>
+        <button id="nextSlideBtn" class="btn-slide-nav btn-next" disabled>Next →</button>
+      </div>
+    </main>
+
+    <footer>
+  <p>© <span id="year"></span> JAK</p>
+</footer>
+
+<script>
+  // Get the current year
+  const year = new Date().getFullYear();
+
+  // Insert it into the footer
+  document.getElementById("year").textContent = year;
+</script>
+
+  </div>
+
+  <script src="public/script.js"></script>
+</body>
+</html>
