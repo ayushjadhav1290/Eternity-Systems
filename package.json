@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "MVP for cloud service selection based on user criteria",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build"
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build": "echo \"Build script not configured for this project.\""
   },
   "keywords": ["cloud", "aws", "azure", "gcp"],
   "author": "",

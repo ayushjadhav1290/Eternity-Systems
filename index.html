@@ -5,15 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cloud Service Selector</title>
   <link rel="stylesheet" href="public/style.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-  <script src="public/depth-map-generator.js"></script>
-  <script src="public/focus-mask-generator.js"></script>
-  <script src="public/film-grain-generator.js"></script>
-  <script src="public/glow-mask-generator.js"></script>
-  <script src="public/focus-reveal.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
+  <script src="public/depth-map-generator.js" defer></script>
+  <script src="public/focus-mask-generator.js" defer></script>
+  <script src="public/film-grain-generator.js" defer></script>
+  <script src="public/glow-mask-generator.js" defer></script>
+  <script src="public/focus-reveal.js" defer></script>
 </head>
 <body>
-  <canvas id="focusRevealCanvas" class="focus-reveal-canvas"></canvas>
+  <canvas id="focusRevealCanvas" class="focus-reveal-canvas" aria-hidden="true"></canvas>
   <div class="container">
     <header>
       <h1>☁️ Cloud Service Selector</h1>
@@ -25,24 +25,34 @@
       <div class="slides-container">
         <!-- Slide 1: Form -->
         <section class="slide active" id="slide-form">
-          <div class="form-section">
-            <h2>Select Your Criteria</h2>
-            <p class="description">Pick which criteria you care about, then adjust their weights (0-100)</p>
-
-            <div class="criteria-selection">
-              <label class="criteria-selection-label">Choose criteria to adjust:</label>
-              <div class="criteria-checkboxes" id="criteriaCheckboxes">
-                <!-- Checkboxes populated by script.js -->
+          <div class="chat-interface">
+            <div id="chatMessages" class="chat-messages">
+              <!-- Messages will appear here -->
+              <div class="message system">
+                <div class="message-content">
+                  Hello! I can help you find the perfect cloud provider. Tell me what you are looking for (e.g., "I need something cheap and reliable for a startup").
+                </div>
               </div>
             </div>
             
-            <form id="criteriaForm">
+            <!-- Hidden Widget Template (Moved into chat when needed) -->
+            <form id="criteriaWidget" class="criteria-widget hidden">
+              <div class="criteria-selection-header">
+                <p>I've selected these parameters based on your input. Adjust them if needed:</p>
+                <div class="criteria-checkboxes" id="criteriaCheckboxes"></div>
+              </div>
               <div id="slidersContainer" class="criteria-group">
                 <!-- Sliders rendered here based on selected criteria -->
               </div>
-
               <button type="submit" class="btn-analyze">Find Best Provider</button>
             </form>
+
+            <div class="chat-input-container">
+              <textarea id="chatInput" placeholder="Describe your cloud needs..." rows="1"></textarea>
+              <button id="sendBtn" class="btn-send">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+              </button>
+            </div>
           </div>
         </section>
 
@@ -124,11 +134,13 @@
 </footer>
 
 <script>
-  // Get the current year
-  const year = new Date().getFullYear();
+  {
+    // Get the current year
+    const year = new Date().getFullYear();
 
-  // Insert it into the footer
-  document.getElementById("year").textContent = year;
+    // Insert it into the footer
+    document.getElementById("year").textContent = year;
+  }
 </script>
 
   </div>

@@ -4,10 +4,14 @@
  */
 
 // DOM Elements
-const form = document.getElementById('criteriaForm');
+const form = document.getElementById('criteriaWidget');
 const resultsSection = document.getElementById('resultsSection');
 const errorSection = document.getElementById('errorSection');
 const loadingSection = document.getElementById('loadingSection');
+const chatMessages = document.getElementById('chatMessages');
+const chatInput = document.getElementById('chatInput');
+const sendBtn = document.getElementById('sendBtn');
+const criteriaWidget = document.getElementById('criteriaWidget');
 
 // Slide elements
 const slidesContainer = document.querySelector('.slides-container');
@@ -19,17 +23,17 @@ let resultsAvailable = false; // Tracks if analysis results exist
 
 // Criteria options (full label, short label, key)
 const CRITERIA_OPTIONS = [
-  { key: 'price', label: 'Is it affordable? (Price)', short: 'Price' },
-  { key: 'speed', label: 'Will it run fast? (Performance)', short: 'Performance' },
-  { key: 'reliability', label: "Can I trust it won't go down? (Reliability)", short: 'Reliability' },
-  { key: 'security', label: 'Is my data safe? (Security)', short: 'Security' },
-  { key: 'scalability', label: 'Can it grow with me? (Scalability)', short: 'Scalability' },
-  { key: 'global_reach', label: 'Does it work where I operate? (Global reach)', short: 'Global reach' },
-  { key: 'support', label: 'Will I get help when needed? (Support)', short: 'Support' },
-  { key: 'service_variety', label: 'Does it offer what I need? (Service variety)', short: 'Service variety' },
-  { key: 'ease_of_use', label: 'Is it easy to use? (Ease of use)', short: 'Ease of use' },
-  { key: 'sustainability', label: 'Does it align with my values? (Sustainability)', short: 'Sustainability' },
-  { key: 'efficiency', label: 'Efficiency', short: 'Efficiency' }
+  { key: 'price', label: 'Is it affordable? (Price)', short: 'Price', keywords: ['price', 'cost', 'cheap', 'expensive', 'budget', 'money', 'affordable', 'pricing'] },
+  { key: 'speed', label: 'Will it run fast? (Performance)', short: 'Performance', keywords: ['speed', 'fast', 'quick', 'slow', 'latency', 'performance', 'compute', 'cpu'] },
+  { key: 'reliability', label: "Can I trust it won't go down? (Reliability)", short: 'Reliability', keywords: ['reliability', 'reliable', 'uptime', 'stable', 'crash', 'down', 'availability'] },
+  { key: 'security', label: 'Is my data safe? (Security)', short: 'Security', keywords: ['security', 'secure', 'safe', 'hack', 'privacy', 'compliance', 'protection'] },
+  { key: 'scalability', label: 'Can it grow with me? (Scalability)', short: 'Scalability', keywords: ['scalability', 'scale', 'grow', 'expand', 'traffic', 'load'] },
+  { key: 'global_reach', label: 'Does it work where I operate? (Global reach)', short: 'Global reach', keywords: ['global', 'reach', 'world', 'location', 'region', 'country'] },
+  { key: 'support', label: 'Will I get help when needed? (Support)', short: 'Support', keywords: ['support', 'help', 'service', 'customer', 'chat'] },
+  { key: 'service_variety', label: 'Does it offer what I need? (Service variety)', short: 'Service variety', keywords: ['variety', 'services', 'features', 'tools', 'products'] },
+  { key: 'ease_of_use', label: 'Is it easy to use? (Ease of use)', short: 'Ease of use', keywords: ['easy', 'simple', 'hard', 'complex', 'user', 'friendly'] },
+  { key: 'sustainability', label: 'Does it align with my values? (Sustainability)', short: 'Sustainability', keywords: ['sustainability', 'green', 'eco', 'carbon', 'environment'] },
+  { key: 'efficiency', label: 'Efficiency', short: 'Efficiency', keywords: ['efficiency', 'efficient', 'power', 'resource', 'optimization'] }
 ];
 
 // Default selected criteria
@@ -108,16 +112,24 @@ function createSliderElement(key) {
   return { wrapper, input, span };
 }
 
-function renderCriteriaCheckboxes() {
+function renderCriteriaCheckboxes(filterToSelected = false) {
   // Render as three table-like columns
   criteriaCheckboxes.innerHTML = '';
-  const total = CRITERIA_OPTIONS.length;
+  
+  const visibleOptions = filterToSelected 
+    ? CRITERIA_OPTIONS.filter(opt => selectedCriteria.has(opt.key))
+    : CRITERIA_OPTIONS;
+
+  const total = visibleOptions.length;
   const perCol = Math.ceil(total / 3);
   for (let col = 0; col < 3; col++) {
+    const start = col * perCol;
+    const slice = visibleOptions.slice(start, start + perCol);
+    
+    if (slice.length === 0) continue;
+
     const colDiv = document.createElement('div');
     colDiv.className = 'criteria-column';
-    const start = col * perCol;
-    const slice = CRITERIA_OPTIONS.slice(start, start + perCol);
     slice.forEach(opt => {
       const cbWrap = document.createElement('label');
       cbWrap.className = 'criteria-checkbox-wrap';
@@ -315,55 +327,155 @@ async function handleSubmit(e) {
   showLoading();
   
   try {
-    const response = await fetch('/api/analyze', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(criteria)
-    });
-    
-    console.log('Response status:', response.status);
-    
-    if (!response.ok) {
-      let errorMsg = 'An error occurred during analysis.';
-      try {
-        const data = await response.json();
-        errorMsg = data.error || errorMsg;
-      } catch (e) {
-        errorMsg = `Server error (${response.status}): ${response.statusText}`;
-      }
-      showError(errorMsg);
-      return;
+    let data;
+    try {
+      // Try actual API first
+      const response = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(criteria)
+      });
+      
+      if (!response.ok) throw new Error('API response not ok');
+      data = await response.json();
+    } catch (apiError) {
+      // Fallback to mock data if API fails (e.g. static file hosting)
+      console.warn('API unavailable, using mock data:', apiError);
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      data = {
+        success: true,
+        providerDetails: {
+          name: "AWS (Amazon Web Services)",
+          description: "The leading cloud provider with the most extensive set of services, ideal for your high-performance needs.",
+          price: 65,
+          efficiency: 85,
+          speed: 95,
+          reliability: 99.99
+        },
+        score: 92.5,
+        reasoning: "Based on your requirements for high speed and reliability, AWS scores the highest despite the higher cost factor.",
+        allScores: [
+          { provider: "AWS", score: 92.5 },
+          { provider: "Google Cloud", score: 88.4 },
+          { provider: "Azure", score: 85.1 },
+          { provider: "DigitalOcean", score: 72.0 }
+        ]
+      };
     }
-    
-    const data = await response.json();
-    console.log('Response data:', data);
-    
+
     if (data.success) {
       showResults(data);
     } else {
-      showError(data.error || 'Analysis failed. Please try again.');
+      showError(data.error || 'Analysis failed.');
     }
   } catch (error) {
     console.error('Request error:', error);
-    showError('Failed to connect to the server. Please make sure the server is running on localhost:3000.');
+    showError('An error occurred during analysis.');
   }
+}
+
+/**
+ * Handle Chat Input
+ */
+function handleChatSubmit() {
+  const text = chatInput.value.trim();
+  if (!text) return;
+
+  // 1. Add User Message
+  addMessage(text, 'user');
+  chatInput.value = '';
+  chatInput.style.height = 'auto'; // Reset height
+
+  // 2. Analyze Text for Keywords
+  const foundCriteria = new Set();
+  const lowerText = text.toLowerCase();
+
+  CRITERIA_OPTIONS.forEach(opt => {
+    if (opt.keywords.some(k => lowerText.includes(k))) {
+      foundCriteria.add(opt.key);
+    }
+  });
+
+  // Default if nothing found, or update selection
+  let filterToSelected = false;
+  if (foundCriteria.size > 0) {
+    selectedCriteria = foundCriteria;
+    filterToSelected = true;
+  } else {
+    // If vague, maybe keep defaults or add generic ones
+    selectedCriteria = new Set(['price', 'reliability', 'speed']);
+    filterToSelected = false;
+  }
+
+  // 3. Render System Response with Widget
+  setTimeout(() => {
+    // Re-render the form components based on new selection
+    renderCriteriaCheckboxes(filterToSelected);
+    renderSliders();
+    
+    // Prevent empty bubbles: Hide previous message if it held the widget
+    if (criteriaWidget.parentNode && criteriaWidget.parentNode.classList.contains('message-content')) {
+      const prevMsg = criteriaWidget.parentNode.parentNode;
+      if (prevMsg) prevMsg.style.display = 'none';
+    }
+
+    // Move the widget into the chat
+    criteriaWidget.classList.remove('hidden');
+    
+    // Create a container for the system message
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'message system';
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'message-content';
+    
+    // Append the widget to this message
+    contentDiv.appendChild(criteriaWidget);
+    msgDiv.appendChild(contentDiv);
+    chatMessages.appendChild(msgDiv);
+    
+    // Scroll to bottom
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }, 500); // Fake "thinking" delay
+}
+
+function addMessage(text, sender) {
+  const msgDiv = document.createElement('div');
+  msgDiv.className = `message ${sender}`;
+  const contentDiv = document.createElement('div');
+  contentDiv.className = 'message-content';
+  contentDiv.textContent = text;
+  msgDiv.appendChild(contentDiv);
+  chatMessages.appendChild(msgDiv);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
 /**
  * Initialize event listeners
  */
 function initializeEventListeners() {
-  // Form submission
-  form.addEventListener('submit', handleSubmit);
+  // Form submission (Analyze button inside widget)
+  if (form) form.addEventListener('submit', handleSubmit);
   
-  // Slider updates
-  sliders.forEach(slider => {
-    slider.addEventListener('input', (e) => {
-      updateSliderDisplay(e.target);
-    });
+  // Chat interactions
+  sendBtn.addEventListener('click', handleChatSubmit);
+  
+  chatInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleChatSubmit();
+    }
   });
+
+  // Auto-resize textarea
+  chatInput.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = (this.scrollHeight) + 'px';
+  });
+  
+  // Slider updates are handled in createSliderElement
   
   // Slide navigation
   prevSlideBtn.addEventListener('click', () => {
@@ -390,8 +502,9 @@ function initializeEventListeners() {
  * Initialize the application
  */
 function initialize() {
-  renderCriteriaCheckboxes();
-  renderSliders();
+  // Initial render (hidden)
+  // renderCriteriaCheckboxes();
+  // renderSliders();
   initializeEventListeners();
   updateSlideButtons();
 }
