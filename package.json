@@ -1,0 +1,15 @@
+{
+  "name": "cloud-selector-mvp",
+  "version": "1.0.0",
+  "description": "MVP for cloud service selection based on user criteria",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["cloud", "aws", "azure", "gcp"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "vite": "^5.0.12"
+  }
+}
