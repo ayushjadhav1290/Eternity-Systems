@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Selector</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Cloud Selector</h1>
+            <p class="subtitle">Find the best cloud provider for your needs.</p>
+        </header>
+
+        <main>
+            <div class="slides-container">
+                <!-- Slide 1: Criteria Form -->
+                <div class="slide active" id="slide-1">
+                    <div class="form-section">
+                        <h2>Define Your Needs</h2>
+                        <p class="description">Adjust the sliders to prioritize what matters most to your project.</p>
+                        
+                        <div class="criteria-group" id="slidersContainer">
+                            <div class="criteria-item" data-criteria="price">
+                                <label>Cost Sensitivity</label>
+                                <div class="slider-container">
+                                    <input type="range" min="1" max="10" value="5" class="slider" id="costSlider">
+                                    <span class="slider-value">5</span>
+                                </div>
+                            </div>
+                            <div class="criteria-item" data-criteria="speed">
+                                <label>Performance Requirements</label>
+                                <div class="slider-container">
+                                    <input type="range" min="1" max="10" value="5" class="slider" id="perfSlider">
+                                    <span class="slider-value">5</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="criteria-selection">
+                            <span class="criteria-selection-label">Services Required:</span>
+                            <div class="criteria-checkboxes">
+                                <div class="criteria-column">
+                                    <label class="criteria-checkbox-wrap"><input type="checkbox" value="compute"> Compute (VMs)</label>
+                                    <label class="criteria-checkbox-wrap"><input type="checkbox" value="db"> Database</label>
+                                </div>
+                                <div class="criteria-column">
+                                    <label class="criteria-checkbox-wrap"><input type="checkbox" value="ai"> AI/ML</label>
+                                    <label class="criteria-checkbox-wrap"><input type="checkbox" value="storage"> Object Storage</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="btn-analyze" id="analyzeBtn">Analyze Options</button>
+                    </div>
+                </div>
+
+                <!-- Slide 2: Results -->
+                <div class="slide" id="slide-2">
+                    <div class="results-section">
+                        <h2>Recommendation</h2>
+                        <div class="result-card">
+                            <span class="winner-badge">Top Choice</span>
+                            <h3>AWS</h3>
+                            <p class="provider-description">Amazon Web Services offers the broadest set of services and global reach.</p>
+                            
+                            <div class="score-display">
+                                <span class="score-label">Match Score:</span>
+                                <span class="score-value">92%</span>
+                            </div>
+
+                            <div class="details-grid">
+                                <div class="detail-item">
+                                    <span class="detail-label">Est. Cost</span>
+                                    <span class="detail-value">$$$</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Regions</span>
+                                    <span class="detail-value">30+</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="slide-controls">
+                            <button class="btn-slide-nav btn-prev" id="restartBtn">Start Over</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 3: Provider Details -->
+                <div class="slide" id="slide-3">
+                    <div class="results-section">
+                        <h2 id="detailsTitle">Provider Details</h2>
+                        <p id="detailsDescription" class="provider-description"></p>
+                        
+                        <div id="detailsContent" class="details-grid">
+                            <!-- Details injected here -->
+                        </div>
+                        
+                        <div class="slide-controls">
+                            <button class="btn-slide-nav btn-prev" id="backToResultsBtn">Back to Results</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Eternity Systems</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

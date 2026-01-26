@@ -93,6 +93,36 @@ const cloudProviders = {
     ease_of_use: 68,
     sustainability: 66,
     description: "Strong for enterprise and hybrid cloud solutions"
+  },
+  Alibaba: {
+    name: "Alibaba Cloud",
+    price: 65,
+    efficiency: 88,
+    speed: 90,
+    reliability: 99.9,
+    security: 88,
+    scalability: 99,
+    global_reach: 90,
+    support: 80,
+    service_variety: 92,
+    ease_of_use: 75,
+    sustainability: 75,
+    description: "Leading cloud provider in Asia with massive scalability"
+  },
+  DigitalOcean: {
+    name: "DigitalOcean",
+    price: 90,
+    efficiency: 80,
+    speed: 85,
+    reliability: 95,
+    security: 85,
+    scalability: 80,
+    global_reach: 70,
+    support: 80,
+    service_variety: 60,
+    ease_of_use: 95,
+    sustainability: 75,
+    description: "Simple, developer-friendly cloud computing, great for startups and small-to-medium projects."
   }
 };
 

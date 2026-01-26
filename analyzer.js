@@ -23,6 +23,21 @@ const PROVIDERS = [
     name: "DigitalOcean",
     description: "Simple, developer-friendly cloud computing, great for startups and small-to-medium projects.",
     scores: { price: 90, efficiency: 80, speed: 85, reliability: 95, security: 85, scalability: 80, global_reach: 70, support: 80, service_variety: 60, ease_of_use: 95, sustainability: 75 }
+  },
+  {
+    name: "Oracle Cloud",
+    description: "Enterprise-grade cloud with strong database capabilities and competitive pricing.",
+    scores: { price: 60, efficiency: 90, speed: 92, reliability: 99, security: 94, scalability: 94, global_reach: 85, support: 86, service_variety: 88, ease_of_use: 70, sustainability: 60 }
+  },
+  {
+    name: "Alibaba Cloud",
+    description: "The leading cloud provider in Asia, offering massive scalability for e-commerce and global business.",
+    scores: { price: 65, efficiency: 88, speed: 90, reliability: 98, security: 88, scalability: 99, global_reach: 90, support: 80, service_variety: 92, ease_of_use: 75, sustainability: 75 }
+  },
+  {
+    name: "IBM Cloud",
+    description: "Ideal for hybrid cloud environments, AI integration, and enterprise-grade security.",
+    scores: { price: 85, efficiency: 86, speed: 88, reliability: 99, security: 98, scalability: 90, global_reach: 80, support: 87, service_variety: 86, ease_of_use: 68, sustainability: 66 }
   }
 ];
 
@@ -70,7 +85,9 @@ function analyzeBestProvider(criteria) {
     reasoning: `Based on your selected criteria, ${winner.provider} offers the best balance.`,
     allScores: results.map(r => ({ 
       provider: r.provider.split(' ')[0], // Short name
-      score: r.score 
+      score: r.score,
+      scores: r.details.scores, // Pass individual scores for details view
+      description: r.details.description
     }))
   };
 }
