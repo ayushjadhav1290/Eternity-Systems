@@ -15,11 +15,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const bestProviderDescription = document.getElementById('bestProviderDescription');
     const bestScore = document.getElementById('bestScore');
     const reasoning = document.getElementById('reasoning');
-    const detailPrice = document.getElementById('detailPrice');
-    const detailEfficiency = document.getElementById('detailEfficiency');
-    const detailSpeed = document.getElementById('detailSpeed');
-    const detailReliability = document.getElementById('detailReliability');
+    const winnerDetailsGrid = document.getElementById('winnerDetailsGrid');
     const providerRanking = document.getElementById('providerRanking');
+    const selectedCriteriaDisplay = document.getElementById('selectedCriteriaDisplay');
 
     // Slide 3 elements
     const detailsTitle = document.getElementById('detailsTitle');
@@ -33,6 +31,39 @@ document.addEventListener('DOMContentLoaded', () => {
     // State
     let currentSlideId = 'slide-form';
     let selectedCriteria = {};
+    let analysisTimeout = null;
+    
+    const availableCriteria = {
+        price: "Price Sensitivity",
+        efficiency: "Efficiency",
+        speed: "Speed",
+        reliability: "Reliability",
+        security: "Security",
+        scalability: "Scalability"
+    };
+
+    const KEYWORDS = {
+        price: ['cheap', 'cost', 'budget', 'price', 'money', 'expensive', 'affordable', 'low cost', 'cheaper'],
+        efficiency: ['efficient', 'green', 'energy', 'power', 'sustainable', 'eco'],
+        speed: ['fast', 'speed', 'quick', 'performance', 'latency', 'rapid', 'compute'],
+        reliability: ['reliable', 'uptime', 'stable', 'crash', 'down', 'availability'],
+        security: ['secure', 'safe', 'hack', 'privacy', 'compliance', 'protect', 'data'],
+        scalability: ['scale', 'grow', 'large', 'traffic', 'expand', 'big', 'load']
+    };
+
+    // Event delegation for sliders
+    slidersContainer.addEventListener('input', (e) => {
+        if (e.target.classList.contains('slider')) {
+            e.target.nextElementSibling.textContent = e.target.value;
+
+            // If user interacts, cancel auto-analysis and inform them
+            if (analysisTimeout) {
+                clearTimeout(analysisTimeout);
+                analysisTimeout = null;
+                addMessage("Great! Adjust the sliders as you see fit, then click 'Find Best Provider' when you're ready.", 'system');
+            }
+        }
+    });
 
 
     /**
@@ -66,6 +97,76 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
+     * Detects criteria keys from user input text.
+     */
+    function getDetectedCriteria(text) {
+        const lowerText = text.toLowerCase();
+        const detected = [];
+        Object.entries(KEYWORDS).forEach(([key, words]) => {
+            if (words.some(word => lowerText.includes(word))) {
+                detected.push(key);
+            }
+        });
+        return detected;
+    }
+
+    /**
+     * Renders a single slider HTML.
+     */
+    function renderSlider(key) {
+        const label = availableCriteria[key];
+        return `
+            <div class="criteria-item" data-criteria="${key}">
+                <label for="${key}Slider">
+                    ${label}
+                    <span class="recommendation-tag hidden" style="font-size: 0.8em; color: #2ecc71; margin-left: 10px;">Recommended: <span class="rec-value"></span></span>
+                </label>
+                <div class="slider-container">
+                    <input type="range" min="0" max="100" value="50" class="slider" id="${key}Slider">
+                    <span class="slider-value">50</span>
+                </div>
+            </div>`;
+    }
+
+    /**
+     * Updates slider values based on detected keys.
+     */
+    function updateSlidersValues(keys) {
+        let updated = false;
+        keys.forEach(key => {
+            const slider = document.getElementById(`${key}Slider`);
+            if (slider) {
+                let currentVal = parseInt(slider.value, 10);
+                let newVal = (currentVal === 0 || currentVal === 50) ? 80 : Math.min(100, currentVal + 10);
+                slider.value = newVal;
+                slider.nextElementSibling.textContent = newVal;
+
+                const container = slider.closest('.criteria-item');
+                const recTag = container.querySelector('.recommendation-tag');
+                const recValue = container.querySelector('.rec-value');
+                if (recTag && recValue) {
+                    recValue.textContent = newVal;
+                    recTag.classList.remove('hidden');
+                }
+
+                updated = true;
+            }
+        });
+        return updated;
+    }
+
+    /**
+     * Starts the auto-analysis timer.
+     */
+    function startAnalysisTimer() {
+        if (analysisTimeout) clearTimeout(analysisTimeout);
+        analysisTimeout = setTimeout(() => {
+            addMessage("You haven't made any changes, so I'll analyze with the current settings...", 'system');
+            handleFormSubmit({ preventDefault: () => {} });
+        }, 7000); // 7 seconds
+    }
+
+    /**
      * Handles sending a user message and triggering the criteria widget.
      */
     function handleSendMessage() {
@@ -79,56 +180,128 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Simulate bot thinking and showing the widget
         setTimeout(() => {
-            addMessage("Interesting. Based on that, I've prepared some criteria for you to adjust. Please refine them below.", 'system');
-            showCriteriaWidget();
+            const detectedKeys = getDetectedCriteria(messageText);
+            let responseText = "";
+            let criteriaUpdated = false;
+            const wasHidden = criteriaWidget.classList.contains('hidden');
+            let shouldStartTimer = true;
+            let suggestionData = null;
+
+            if (detectedKeys.length > 0) {
+                showCriteriaWidget(detectedKeys);
+                criteriaUpdated = updateSlidersValues(detectedKeys);
+
+                if (wasHidden) {
+                    if (detectedKeys.length === 1) {
+                        const keyName = availableCriteria[detectedKeys[0]];
+                        const otherKeys = Object.keys(availableCriteria).filter(k => k !== detectedKeys[0]);
+                        const randomKey = otherKeys[Math.floor(Math.random() * otherKeys.length)];
+                        const suggestionName = availableCriteria[randomKey];
+                        responseText = `I noticed you're interested in ${keyName}. What about ${suggestionName}?`;
+                        shouldStartTimer = false;
+                        suggestionData = { key: randomKey, name: suggestionName };
+                    } else {
+                        responseText = "I've analyzed your request and pre-configured the criteria below based on your description. Feel free to fine-tune them.";
+                    }
+                } else {
+                    responseText = "I've updated the sliders based on your new input. Please verify they match your needs.";
+                }
+                
+                addMessage(responseText, 'system');
+                chatMessages.appendChild(criteriaWidget);
+
+                // Inject buttons if a suggestion was made
+                if (suggestionData) {
+                    const actionsDiv = document.createElement('div');
+                    actionsDiv.className = 'chat-actions';
+                    actionsDiv.style.marginTop = '10px';
+                    actionsDiv.style.marginBottom = '10px';
+                    
+                    const yesBtn = document.createElement('button');
+                    yesBtn.textContent = 'Yes';
+                    yesBtn.className = 'btn-view-details'; 
+                    yesBtn.style.marginRight = '10px';
+                    
+                    const noBtn = document.createElement('button');
+                    noBtn.textContent = 'No';
+                    noBtn.className = 'btn-view-details';
+                    
+                    actionsDiv.appendChild(yesBtn);
+                    actionsDiv.appendChild(noBtn);
+                    // Insert buttons before the widget
+                    chatMessages.insertBefore(actionsDiv, criteriaWidget);
+                    
+                    yesBtn.onclick = () => {
+                        actionsDiv.remove();
+                        addMessage("Yes", 'user');
+                        
+                        const newKeys = [...detectedKeys, suggestionData.key];
+                        showCriteriaWidget(newKeys);
+                        updateSlidersValues([suggestionData.key]);
+                        
+                        addMessage(`Great, I've added ${suggestionData.name} to the criteria.`, 'system');
+                        startAnalysisTimer();
+                    };
+
+                    noBtn.onclick = () => {
+                        actionsDiv.remove();
+                        addMessage("No", 'user');
+                        startAnalysisTimer();
+                    };
+                }
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            } else {
+                if (wasHidden) {
+                    addMessage("I can help you find the best cloud provider. Please tell me what you are looking for (e.g., 'cheap', 'fast').", 'system');
+                    shouldStartTimer = false;
+                } else {
+                    addMessage("I didn't detect specific criteria in your message. Feel free to adjust the sliders manually.", 'system');
+                    chatMessages.appendChild(criteriaWidget);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+            }
+
+            // Clear any previous timer and set a new one for auto-analysis
+            if (analysisTimeout) clearTimeout(analysisTimeout);
+            if (shouldStartTimer) {
+                startAnalysisTimer();
+            }
+
             chatInput.disabled = false;
             sendBtn.disabled = false;
+            chatInput.focus();
         }, 1200);
     }
 
     /**
      * Shows and populates the criteria selection widget if it's not already visible.
      */
-    function showCriteriaWidget() {
-        if (criteriaWidget.classList.contains('hidden')) {
-            const availableCriteria = {
-                price: "Price Sensitivity",
-                efficiency: "Efficiency",
-                speed: "Speed",
-                reliability: "Reliability",
-                security: "Security",
-                scalability: "Scalability"
-            };
-
+    function showCriteriaWidget(keysToShow = null) {
+        const isHidden = criteriaWidget.classList.contains('hidden');
+        
+        if (isHidden) {
             slidersContainer.innerHTML = ''; // Clear previous sliders
-
-            Object.entries(availableCriteria).forEach(([key, label]) => {
-                const sliderHTML = `
-                    <div class="criteria-item" data-criteria="${key}">
-                        <label for="${key}Slider">${label}</label>
-                        <div class="slider-container">
-                            <input type="range" min="0" max="100" value="50" class="slider" id="${key}Slider">
-                            <span class="slider-value">50</span>
-                        </div>
-                    </div>`;
-                slidersContainer.insertAdjacentHTML('beforeend', sliderHTML);
+            
+            // If specific keys detected, show only those. Otherwise show all.
+            const keys = (keysToShow && keysToShow.length > 0) ? keysToShow : Object.keys(availableCriteria);
+            
+            keys.forEach(key => {
+                if (availableCriteria[key]) {
+                    slidersContainer.insertAdjacentHTML('beforeend', renderSlider(key));
+                }
             });
             
             chatMessages.appendChild(criteriaWidget);
             criteriaWidget.classList.remove('hidden');
-            setupSliderListeners();
-        }
-    }
-
-    /**
-     * Sets up 'input' event listeners for dynamically added sliders to update their value display.
-     */
-    function setupSliderListeners() {
-        slidersContainer.querySelectorAll('.slider').forEach(slider => {
-            slider.addEventListener('input', (e) => {
-                e.target.nextElementSibling.textContent = e.target.value;
+        } else {
+            // Widget already visible, add any new detected keys if missing
+            const keys = (keysToShow && keysToShow.length > 0) ? keysToShow : [];
+            keys.forEach(key => {
+                if (!document.getElementById(`${key}Slider`) && availableCriteria[key]) {
+                    slidersContainer.insertAdjacentHTML('beforeend', renderSlider(key));
+                }
             });
-        });
+        }
     }
 
     /**
@@ -137,6 +310,13 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     async function handleFormSubmit(e) {
         e.preventDefault();
+
+        // Clear the auto-analysis timer if it's running
+        if (analysisTimeout) {
+            clearTimeout(analysisTimeout);
+            analysisTimeout = null;
+        }
+
         showSlide('slide-loading');
 
         const criteria = {};
@@ -174,10 +354,33 @@ document.addEventListener('DOMContentLoaded', () => {
         bestProviderDescription.textContent = providerDetails.description;
         bestScore.textContent = `${score}%`;
         reasoning.textContent = reasoningText;
-        detailPrice.textContent = providerDetails.price;
-        detailEfficiency.textContent = providerDetails.efficiency;
-        detailSpeed.textContent = providerDetails.speed;
-        detailReliability.textContent = providerDetails.reliability;
+
+        // Display selected criteria summary
+        if (selectedCriteriaDisplay) {
+            const criteriaHtml = Object.entries(selectedCriteria)
+                .filter(([_, value]) => value > 0)
+                .sort(([, a], [, b]) => b - a)
+                .map(([key, value]) => `<div class="criteria-tag">${key.charAt(0).toUpperCase() + key.slice(1)}: <span>${value}</span></div>`)
+                .join('');
+            
+            selectedCriteriaDisplay.innerHTML = criteriaHtml || '<div class="criteria-tag">Default Settings</div>';
+        }
+
+        // Populate winner details dynamically based on selected criteria
+        // Sort criteria by weight descending so the most important ones appear first
+        const sortedCriteria = Object.entries(selectedCriteria)
+            .sort(([, weightA], [, weightB]) => weightB - weightA);
+
+        let winnerDetailsHtml = '';
+        for (const [key, weight] of sortedCriteria) {
+            if (providerDetails.scores[key] !== undefined && weight > 0) {
+                const label = key.charAt(0).toUpperCase() + key.slice(1);
+                winnerDetailsHtml += `
+                    <div class="detail-item"><span class="detail-label">${label}</span><span class="detail-value">${providerDetails.scores[key]}</span></div>
+                `;
+            }
+        }
+        winnerDetailsGrid.innerHTML = winnerDetailsHtml;
 
         let tableHtml = `<table class="provider-table"><thead><tr><th>Rank</th><th>Provider</th><th style="text-align: right;">Score</th><th>Details</th></tr></thead><tbody>`;
         allScores.forEach((item, index) => {
@@ -213,10 +416,14 @@ document.addEventListener('DOMContentLoaded', () => {
         detailsTitle.textContent = providerName;
         detailsDescription.textContent = description;
         
+        // Sort criteria by weight descending
+        const sortedCriteria = Object.entries(selectedCriteria)
+            .sort(([, weightA], [, weightB]) => weightB - weightA);
+
         let detailsHtml = '';
         // Use the stored selectedCriteria to show only relevant scores
-        for (const key in selectedCriteria) {
-            if (Object.hasOwnProperty.call(selectedCriteria, key) && scores[key] !== undefined) {
+        for (const [key, weight] of sortedCriteria) {
+            if (scores[key] !== undefined && weight > 0) {
                 const label = key.charAt(0).toUpperCase() + key.slice(1);
                 detailsHtml += `
                     <div class="detail-item"><span class="detail-label">${label}</span><span class="detail-value">${scores[key]}</span></div>

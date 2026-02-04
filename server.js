@@ -21,6 +21,13 @@ const server = http.createServer((req, res) => {
     const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
     let pathname = decodeURIComponent(parsedUrl.pathname);
     
+    // Handle favicon.ico to prevent 404 errors
+    if (pathname === '/favicon.ico') {
+      res.writeHead(204);
+      res.end();
+      return;
+    }
+
     // API Endpoint for analysis
     if (pathname === '/api/analyze' && req.method === 'POST') {
       let body = '';

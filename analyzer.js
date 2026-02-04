@@ -76,10 +76,7 @@ function analyzeBestProvider(criteria) {
     providerDetails: {
       name: winner.details.name,
       description: winner.details.description,
-      price: winner.details.scores.price,
-      efficiency: winner.details.scores.efficiency,
-      speed: winner.details.scores.speed,
-      reliability: winner.details.scores.reliability
+      scores: winner.details.scores
     },
     score: winner.score,
     reasoning: `Based on your selected criteria, ${winner.provider} offers the best balance.`,
