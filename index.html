@@ -1,19 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cloud Service Selector</title>
   <link rel="stylesheet" href="public/style.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
-  <script src="public/depth-map-generator.js" defer></script>
-  <script src="public/focus-mask-generator.js" defer></script>
-  <script src="public/film-grain-generator.js" defer></script>
-  <script src="public/glow-mask-generator.js" defer></script>
-  <script src="public/focus-reveal.js" defer></script>
 </head>
+
 <body>
-  <canvas id="focusRevealCanvas" class="focus-reveal-canvas" aria-hidden="true"></canvas>
+  <!-- Canvas removed -->
   <div class="container">
     <header>
       <h1>☁️ Cloud Service Selector</h1>
@@ -30,11 +27,12 @@
               <!-- Messages will appear here -->
               <div class="message system">
                 <div class="message-content">
-                  Hello! I can help you find the perfect cloud provider. Tell me what you are looking for (e.g., "I need something cheap and reliable for a startup").
+                  Hello! I can help you find the perfect cloud provider. Tell me what you are looking for (e.g., "I need
+                  something cheap and reliable for a startup").
                 </div>
               </div>
             </div>
-            
+
             <!-- Hidden Widget Template (Moved into chat when needed) -->
             <form id="criteriaWidget" class="criteria-widget hidden">
               <div class="criteria-selection-header">
@@ -50,7 +48,11 @@
             <div class="chat-input-container">
               <textarea id="chatInput" placeholder="Describe your cloud needs..." rows="1"></textarea>
               <button id="sendBtn" class="btn-send">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
               </button>
             </div>
           </div>
@@ -60,7 +62,7 @@
         <section class="slide" id="slide-results">
           <div id="resultsSection" class="results-section">
             <h2>Analysis Results</h2>
-            
+
             <div class="result-card">
               <div class="winner-badge">🏆 Best Choice</div>
               <h3 id="bestProviderName"></h3>
@@ -69,7 +71,7 @@
                 <span class="score-label">Overall Score:</span>
                 <span class="score-value" id="bestScore"></span>
               </div>
-              
+
               <div class="reasoning-box">
                 <h4>Why this provider?</h4>
                 <p id="reasoning"></p>
@@ -84,7 +86,7 @@
               <h3>Comparison with Other Providers</h3>
               <div class="provider-ranking" id="providerRanking"></div>
             </div>
-            
+
           </div>
         </section>
 
@@ -93,7 +95,7 @@
           <div class="results-section">
             <h2 id="detailsTitle">Provider Details</h2>
             <p id="detailsDescription" class="provider-description"></p>
-            
+
             <div id="detailsContent" class="details-grid">
               <!-- Details injected here by JS -->
             </div>
@@ -127,21 +129,22 @@
     </main>
 
     <footer>
-  <p>© <span id="year"></span> JAK</p>
-</footer>
+      <p>© <span id="year"></span> JAK</p>
+    </footer>
 
-<script>
-  {
-    // Get the current year
-    const year = new Date().getFullYear();
+    <script>
+      {
+        // Get the current year
+        const year = new Date().getFullYear();
 
-    // Insert it into the footer
-    document.getElementById("year").textContent = year;
-  }
-</script>
+        // Insert it into the footer
+        document.getElementById("year").textContent = year;
+      }
+    </script>
 
   </div>
 
   <script src="public/script.js"></script>
 </body>
+
 </html>

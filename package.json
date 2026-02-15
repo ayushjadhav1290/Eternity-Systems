@@ -7,10 +7,18 @@
     "dev": "node server.js",
     "build": "echo \"Build script not configured for this project.\""
   },
-  "keywords": ["cloud", "aws", "azure", "gcp"],
+  "keywords": [
+    "cloud",
+    "aws",
+    "azure",
+    "gcp"
+  ],
   "author": "",
   "license": "MIT",
   "devDependencies": {
     "vite": "^5.0.12"
+  },
+  "dependencies": {
+    "framer-motion": "^12.34.0"
   }
 }

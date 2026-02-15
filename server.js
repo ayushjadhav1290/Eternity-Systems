@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const analyzer = require('./analyzer');
 
-const PORT = 3000;
+const PORT = 3001;
 
 const mimeTypes = {
   '.html': 'text/html',
@@ -20,7 +20,7 @@ const server = http.createServer((req, res) => {
   try {
     const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
     let pathname = decodeURIComponent(parsedUrl.pathname);
-    
+
     // Handle favicon.ico to prevent 404 errors
     if (pathname === '/favicon.ico') {
       res.writeHead(204);
