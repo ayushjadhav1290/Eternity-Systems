@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Selector</title>
+    <link rel="stylesheet" href="public/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Cloud Selector</h1>
+            <p class="subtitle">Find the best cloud provider for your needs.</p>
+        </header>
+
+        <main class="split-layout">
+            <!-- Left Panel: Chat Interface -->
+            <div class="left-panel">
+                <div class="chat-header">
+                    <h2>Cloud Service Selector</h2>
+                </div>
+                
+                <div class="chat-container">
+                    <div id="chatMessages" class="chat-messages"></div>
+                </div>
+
+                <!-- Criteria Widget - Hidden, will be shown when needed -->
+                <div class="criteria-widget hidden" id="criteriaWidget">
+                    <h3>Define Your Needs</h3>
+                    <p class="description">Adjust the sliders to prioritize what matters most to your project.</p>
+                    
+                    <div class="criteria-group" id="slidersContainer">
+                        <div class="criteria-item" data-criteria="price">
+                            <label>Cost Sensitivity</label>
+                            <div class="slider-container">
+                                <input type="range" min="1" max="10" value="5" class="slider" id="costSlider">
+                                <span class="slider-value">5</span>
+                            </div>
+                        </div>
+                        <div class="criteria-item" data-criteria="speed">
+                            <label>Performance Requirements</label>
+                            <div class="slider-container">
+                                <input type="range" min="1" max="10" value="5" class="slider" id="perfSlider">
+                                <span class="slider-value">5</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="criteria-selection">
+                        <span class="criteria-selection-label">Services Required:</span>
+                        <div class="criteria-checkboxes">
+                            <div class="criteria-column">
+                                <label class="criteria-checkbox-wrap"><input type="checkbox" value="compute"> Compute (VMs)</label>
+                                <label class="criteria-checkbox-wrap"><input type="checkbox" value="db"> Database</label>
+                            </div>
+                            <div class="criteria-column">
+                                <label class="criteria-checkbox-wrap"><input type="checkbox" value="ai"> AI/ML</label>
+                                <label class="criteria-checkbox-wrap"><input type="checkbox" value="storage"> Object Storage</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn-analyze" id="analyzeBtn">Analyze Options</button>
+                </div>
+
+                <div class="chat-input-area">
+                    <div class="input-wrapper">
+                        <input 
+                            type="text" 
+                            id="chatInput" 
+                            class="chat-input" 
+                            placeholder="Describe your cloud needs..."
+                        >
+                        <button id="sendBtn" class="send-btn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Results/Recommendations -->
+            <div class="right-panel">
+                <div class="results-header">
+                    <h2>Recommended Providers</h2>
+                </div>
+
+                <!-- Navigation buttons (hidden, used by script) -->
+                <button id="prevSlideBtn" style="display:none;"></button>
+                <button id="nextSlideBtn" style="display:none;"></button>
+
+                <div class="results-container">
+                    <div class="slides-container">
+                        <!-- Slide 1: Form/Chat - Empty State -->
+                        <div class="slide active" id="slide-form">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">
+                                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <circle cx="12" cy="12" r="9"></circle>
+                                        <circle cx="12" cy="12" r="5"></circle>
+                                        <path d="M12 2v6"></path>
+                                    </svg>
+                                </div>
+                                <p class="empty-state-text">Ask something to see recommendations →</p>
+                            </div>
+                        </div>
+
+                        <!-- Slide 2: Results -->
+                        <div class="slide" id="slide-results">
+                            <div class="results-section">
+                                <h3>Top Recommendation</h3>
+                                <div class="result-card">
+                                    <span class="winner-badge">Top Choice</span>
+                                    <h4 id="bestProviderName">AWS</h4>
+                                    <p id="bestProviderDescription" class="provider-description">Amazon Web Services offers the broadest set of services and global reach.</p>
+                                    
+                                    <div class="score-display">
+                                        <span class="score-label">Match Score:</span>
+                                        <span class="score-value" id="bestScore">92%</span>
+                                    </div>
+
+                                    <div class="details-grid" id="winnerDetailsGrid">
+                                        <div class="detail-item">
+                                            <span class="detail-label">Est. Cost</span>
+                                            <span class="detail-value">$$$</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <span class="detail-label">Regions</span>
+                                            <span class="detail-value">30+</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="reasoning" class="reasoning-section"></div>
+                                
+                                <h4 class="ranking-title">Other Options</h4>
+                                <div id="providerRanking" class="provider-ranking"></div>
+                            </div>
+                        </div>
+
+                        <!-- Slide 3: Details -->
+                        <div class="slide" id="slide-details">
+                            <div class="results-section">
+                                <h3 id="detailsTitle">Provider Details</h3>
+                                <p id="detailsDescription" class="provider-description"></p>
+                                
+                                <div id="detailsContent" class="details-grid">
+                                    <!-- Details injected here -->
+                                </div>
+                                
+                                <div class="slide-controls">
+                                    <button class="btn-slide-nav btn-prev" id="backToResultsBtn">Back to Results</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Error Slide -->
+                        <div class="slide" id="slide-error">
+                            <div class="error-section">
+                                <p id="errorMessage" class="error-message"></p>
+                                <button class="btn-slide-nav" id="restartErrorBtn">Try Again</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 JAK ©</p>
+    </footer>
+
+    <script src="public/script.js"></script>
+</body>
+</html>
