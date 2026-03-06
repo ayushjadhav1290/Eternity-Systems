@@ -33,6 +33,93 @@
   /* Light grey for user */
   --chat-bubble-system: transparent;
   /* No bubble for system */
+  
+  /* Transition speed for theme change */
+  --theme-transition: 0.3s ease-in-out;
+}
+
+/* Dark Mode Variables */
+body.dark-mode {
+  --primary-color: #e8eaed;
+  --secondary-color: #aecbfa;
+  --success-color: #81c995;
+  --warning-color: #fcc934;
+  --error-color: #f28482;
+  --light-bg: #2d2d30;
+  --surface-color: #1e1e1e;
+  --border-color: #3f3f46;
+  --text-dark: #e8eaed;
+  --text-light: #b0b0b0;
+  --cyan-accent: #4dd0e1;
+  --blue-accent: #aecbfa;
+  --chat-bubble-user: #3f3f46;
+  --chat-bubble-system: transparent;
+}
+
+/* Dark Mode Color Overrides for Hardcoded White Backgrounds */
+body.dark-mode .detail-item {
+  background: #2d2d30;
+}
+
+body.dark-mode .criteria-tag {
+  background: #2d2d30;
+}
+
+body.dark-mode .criteria-column {
+  background: #2d2d30;
+}
+
+body.dark-mode .provider-table {
+  background: #1e1e1e;
+}
+
+body.dark-mode .provider-table tbody tr {
+  background: transparent;
+}
+
+body.dark-mode .provider-table tbody tr:hover {
+  background: #2d2d30;
+}
+
+body.dark-mode .provider-table tbody tr.winner-row {
+  background: rgba(129, 201, 149, 0.1);
+}
+
+body.dark-mode .provider-table tbody tr.winner-row:hover {
+  background: rgba(129, 201, 149, 0.15);
+}
+
+body.dark-mode .error-card {
+  background: rgba(242, 132, 130, 0.1);
+  border-color: #f28482;
+}
+
+body.dark-mode .error-card h3 {
+  color: #f28482;
+}
+
+body.dark-mode .winner-badge {
+  background: rgba(129, 201, 149, 0.2);
+  color: #81c995;
+}
+
+body.dark-mode .modal-content {
+  background: #1e1e1e;
+}
+
+/* Dark Mode Input Field Fixes */
+body.dark-mode .chat-input {
+  background: var(--light-bg);
+  color: var(--text-dark);
+}
+
+body.dark-mode .chat-input:focus {
+  background: #3f3f46;
+  color: var(--text-dark);
+}
+
+body.dark-mode .chat-input::placeholder {
+  color: #a1a1aa;
 }
 
 body {
@@ -47,6 +134,7 @@ body {
   flex-direction: column;
   overflow: hidden;
   /* App-like feel */
+  transition: background-color var(--theme-transition), color var(--theme-transition);
 }
 
 /* Remove blurred background image */
@@ -81,6 +169,7 @@ header {
   border-bottom: 1px solid var(--border-color);
   /* Subtle divider */
   background: var(--surface-color);
+  transition: background-color var(--theme-transition), border-color var(--theme-transition);
 }
 
 header h1 {
@@ -89,11 +178,56 @@ header h1 {
   color: var(--text-dark);
   font-weight: 500;
   margin: 0;
+  transition: color var(--theme-transition);
 }
 
-header .subtitle {
-  display: none;
-  /* Hide subtitle for cleaner look */
+/* Theme Toggle Button */
+.theme-toggle {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-dark);
+  transition: all var(--theme-transition);
+  position: relative;
+  flex-shrink: 0;
+  margin: 0 0 0 auto;
+}
+
+.theme-toggle:hover {
+  background: var(--light-bg);
+  border-color: var(--secondary-color);
+  transform: scale(1.05);
+}
+
+.theme-toggle svg {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+  color: var(--text-dark);
+}
+
+.theme-toggle .theme-icon-sun {
+  opacity: 0;
+  transform: rotate(-90deg);
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+body.dark-mode .theme-toggle .theme-icon-moon {
+  opacity: 0;
+  transform: rotate(90deg);
+}
+
+body.dark-mode .theme-toggle .theme-icon-sun {
+  opacity: 1;
+  transform: rotate(0deg);
 }
 
 /* Main Content - Split Layout */
@@ -122,6 +256,7 @@ main.split-layout {
   border-right: 1px solid var(--border-color);
   background: var(--surface-color);
   overflow: hidden;
+  transition: background-color var(--theme-transition), border-color var(--theme-transition);
 }
 
 .chat-header {
@@ -129,6 +264,7 @@ main.split-layout {
   border-bottom: 1px solid var(--border-color);
   background: var(--surface-color);
   flex-shrink: 0;
+  transition: background-color var(--theme-transition), border-color var(--theme-transition);
 }
 
 .chat-header h2 {
@@ -136,6 +272,7 @@ main.split-layout {
   color: var(--text-dark);
   font-weight: 500;
   margin: 0;
+  transition: color var(--theme-transition);
 }
 
 .chat-container {
@@ -151,6 +288,7 @@ main.split-layout {
   border-top: 1px solid var(--border-color);
   background: var(--surface-color);
   flex-shrink: 0;
+  transition: background-color var(--theme-transition), border-color var(--theme-transition);
 }
 
 .input-wrapper {
@@ -171,7 +309,7 @@ main.split-layout {
   max-height: 120px;
   min-height: 44px;
   outline: none;
-  transition: background 0.2s, box-shadow 0.2s;
+  transition: background var(--theme-transition), box-shadow 0.2s, color var(--theme-transition);
   color: var(--text-dark);
 }
 
@@ -214,6 +352,7 @@ main.split-layout {
   flex-direction: column;
   background: var(--surface-color);
   overflow: hidden;
+  transition: background-color var(--theme-transition);
 }
 
 .results-header {
@@ -221,6 +360,7 @@ main.split-layout {
   border-bottom: 1px solid var(--border-color);
   background: var(--surface-color);
   flex-shrink: 0;
+  transition: background-color var(--theme-transition), border-color var(--theme-transition);
 }
 
 .results-header h2 {
@@ -228,6 +368,7 @@ main.split-layout {
   color: var(--text-dark);
   font-weight: 500;
   margin: 0;
+  transition: color var(--theme-transition);
 }
 
 .results-container {
@@ -341,6 +482,7 @@ main.split-layout {
   border-radius: 8px;
   padding: 12px;
   min-width: 0;
+  transition: background-color var(--theme-transition), border-color var(--theme-transition);
 }
 
 .criteria-column .criteria-checkbox-wrap {
@@ -436,6 +578,7 @@ main.split-layout {
   color: var(--text-dark);
   border-radius: 16px 16px 4px 16px;
   box-shadow: none;
+  transition: background-color var(--theme-transition), color var(--theme-transition);
 }
 
 /* System Message - text only or subtle */
@@ -445,6 +588,7 @@ main.split-layout {
   border: none;
   box-shadow: none;
   padding-left: 0;
+  transition: color var(--theme-transition);
 }
 
 /* Criteria Widget inside Chat */
@@ -510,6 +654,7 @@ main.split-layout {
   width: 100%;
   box-sizing: border-box;
   flex-shrink: 0;
+  transition: background-color var(--theme-transition), border-color var(--theme-transition);
 }
 
 .criteria-widget h3 {
@@ -662,6 +807,7 @@ main.split-layout {
   font-weight: 600;
   color: var(--text-dark);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: background-color var(--theme-transition), border-color var(--theme-transition), color var(--theme-transition);
 }
 
 .criteria-tag span {
@@ -678,6 +824,7 @@ main.split-layout {
   position: relative;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: background-color var(--theme-transition), border-color var(--theme-transition);
 }
 
 .result-card::before {
@@ -749,7 +896,7 @@ main.split-layout {
   border-radius: 8px;
   text-align: center;
   border: 1px solid var(--border-color);
-  transition: all 0.3s ease;
+  transition: all 0.3s ease, background-color var(--theme-transition), border-color var(--theme-transition), color var(--theme-transition);
 }
 
 .detail-item:hover {
@@ -801,9 +948,8 @@ main.split-layout {
 }
 
 .provider-table thead {
-  background: linear-gradient(135deg, var(--primary-color) 0%, rgba(15, 23, 42, 0.9) 100%);
-  color: var(--cyan-accent);
-  text-shadow: 0 0 8px rgba(34, 211, 238, 0.15);
+  background: #0A2540;
+  color: #60A5FA;
   border-bottom: 2px solid var(--secondary-color);
 }
 
@@ -913,6 +1059,7 @@ main.split-layout {
   border-radius: 8px;
   margin-bottom: 12px;
   border-left: none;
+  transition: background-color var(--theme-transition), color var(--theme-transition);
 }
 
 .reasoning-box h4 {
