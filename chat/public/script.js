@@ -487,7 +487,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (deployBtn) {
             // Placeholder for deploy links - populate this object with the links you provide
             const deployLinks = {
-                // "Provider Name": "https://link.to.deploy",
+                "AWS": "https://aws.amazon.com/pm/ec2/?trk=66f5e660-0166-4017-a39f-75ed68150e2c&sc_channel=ps&ef_id=CjwKCAiAtq_NBhA_EiwA78nNWFvaF0aO_DSvQIFMJbO_uk0vUA4Snaxl6sUQ5yYM5oCQDkHdux-QfRoCXOQQAvD_BwE:G:s&s_kwcid=AL!4422!3!795841121029!e!!g!!aws%20ec2!23528572727!192827504556&gad_campaignid=23528572727&gbraid=0AAAAADjHtp_Vd-VdIobZkQluDnWrNVwcH&gclid=CjwKCAiAtq_NBhA_EiwA78nNWFvaF0aO_DSvQIFMJbO_uk0vUA4Snaxl6sUQ5yYM5oCQDkHdux-QfRoCXOQQAvD_BwE",
+                "IBM": "https://www.ibm.com/solutions/cloud",
+                "Microsoft": "https://azure.microsoft.com/en-in",
+                "Google": "https://cloud.google.com/",
+                "DigitalOcean": "https://www.digitalocean.com/?utm_source=google&utm_medium=cpc&utm_campaign=search_in_en_brand&utm_adgroup=digitalocean_exact_exact&utm_term=digital%20ocean&utm_creative=749611851097&utm_location=1007788&utm_matchtype=e&gad_source=1&gad_campaignid=22502873005&gbraid=0AAAAADw9jcva0Ydb_RmdyZlKaMVJp54lK&gclid=CjwKCAiAtq_NBhA_EiwA78nNWPN_P3kPmUGHlTYmVCC6qHBXwqstgDYXnQWsNS7HMZ9fdNRA17_moxoC008QAvD_BwE",
+                "Oracle": "https://www.oracle.com/in/cloud/",
+                "Alibaba Cloud": "https://www.alibabacloud.com/en?_p_lc=1"
             };
             deployBtn.href = deployLinks[providerName] || '#';
         }
