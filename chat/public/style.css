@@ -1142,7 +1142,7 @@ main.split-layout {
 /* Footer */
 footer {
   text-align: center;
-  color: white;
+  color: var(--text-light);
   opacity: 0.8;
   font-size: 0.85rem;
   margin-top: 20px;

@@ -25,6 +25,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const detailsContent = document.getElementById('detailsContent');
     const backToResultsBtn = document.getElementById('backToResultsBtn');
 
+    // Deploy Button logic
+    let deployBtn = document.getElementById('deployBtn');
+    if (!deployBtn && backToResultsBtn && backToResultsBtn.parentNode) {
+        deployBtn = document.createElement('a');
+        deployBtn.id = 'deployBtn';
+        deployBtn.textContent = 'Deploy';
+        // Match the class of the back button for consistent styling
+        deployBtn.className = backToResultsBtn.className || 'btn-view-details';
+        // Custom styling for Deploy button (Green)
+        deployBtn.style.marginLeft = '10px';
+        deployBtn.style.textDecoration = 'none';
+        deployBtn.style.display = 'inline-flex';
+        deployBtn.style.alignItems = 'center';
+        deployBtn.style.justifyContent = 'center';
+        deployBtn.style.cursor = 'pointer';
+        deployBtn.style.backgroundColor = '#28a745'; // Green
+        deployBtn.style.color = 'white';
+        deployBtn.style.border = '1px solid #28a745';
+        deployBtn.target = '_blank';
+        deployBtn.href = '#';
+        backToResultsBtn.parentNode.insertBefore(deployBtn, backToResultsBtn.nextSibling);
+    }
+
     // Error slide elements
     const errorMessage = document.getElementById('errorMessage');
 
@@ -211,18 +234,29 @@ document.addEventListener('DOMContentLoaded', () => {
         // Simulate bot thinking and showing the widget
         setTimeout(() => {
             const detectedKeys = getDetectedCriteria(messageText);
+            
+            // Check for "show all" intent
+            const lowerText = messageText.toLowerCase();
+            const isShowAll = lowerText.includes('show all') || lowerText.includes('list all') || lowerText.includes('all criteria') || lowerText === 'all';
+
             let responseText = "";
             let criteriaUpdated = false;
             const wasHidden = criteriaWidget.classList.contains('hidden');
             let shouldStartTimer = true;
             let suggestionData = null;
 
-            if (detectedKeys.length > 0) {
-                showCriteriaWidget(detectedKeys);
-                criteriaUpdated = updateSlidersValues(detectedKeys);
+            if (detectedKeys.length > 0 || isShowAll) {
+                const keysToShow = isShowAll ? Object.keys(availableCriteria) : detectedKeys;
+                showCriteriaWidget(keysToShow);
+                
+                if (!isShowAll) {
+                    criteriaUpdated = updateSlidersValues(detectedKeys);
+                }
 
                 if (wasHidden) {
-                    if (detectedKeys.length === 1) {
+                    if (isShowAll) {
+                        responseText = "Here are all the criteria available. You can adjust them to your preference.";
+                    } else if (detectedKeys.length === 1) {
                         const keyName = availableCriteria[detectedKeys[0]];
                         const otherKeys = Object.keys(availableCriteria).filter(k => k !== detectedKeys[0]);
                         const randomKey = otherKeys[Math.floor(Math.random() * otherKeys.length)];
@@ -234,7 +268,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         responseText = "I've analyzed your request and pre-configured the criteria below based on your description. Feel free to fine-tune them.";
                     }
                 } else {
-                    responseText = "I've updated the sliders based on your new input. Please verify they match your needs.";
+                    if (isShowAll) {
+                        responseText = "I've revealed all criteria sliders for you.";
+                    } else {
+                        responseText = "I've updated the sliders based on your new input. Please verify they match your needs.";
+                    }
                 }
                 
                 addMessage(responseText, 'system');
@@ -446,6 +484,14 @@ document.addEventListener('DOMContentLoaded', () => {
         detailsTitle.textContent = providerName;
         detailsDescription.textContent = description;
         
+        if (deployBtn) {
+            // Placeholder for deploy links - populate this object with the links you provide
+            const deployLinks = {
+                // "Provider Name": "https://link.to.deploy",
+            };
+            deployBtn.href = deployLinks[providerName] || '#';
+        }
+
         // Sort criteria by weight descending
         const sortedCriteria = Object.entries(selectedCriteria)
             .sort(([, weightA], [, weightB]) => weightB - weightA);
